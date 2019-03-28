@@ -1,9 +1,11 @@
 //importamos archivo config
 require('./config/config');
 
+const port = 3000;
+
 const express = require('express');
 const app = express();
-const port = 3000;
+const mongoose = require('mongoose');
 
 const bodyParser = require('body-parser');
 // parse application/x-www-form-urlencoded
@@ -12,33 +14,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/usuario', (req, res) => {
-    res.json('get Usuario');
-});
+app.use(require('./routes/usuarios'));
 
-app.post('/usuario', (req, res) => {
+//Definimos la conexión con la BD
+mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useCreateIndex: true },
+    (err, res) => {
 
-    let body = req.body;
+        if (err) throw err;
 
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es obligatorio'
-        });
-    } else {
-        res.json(body);
-    }
-});
+        console.log('Base de datos ONLINE');
 
-app.put('/usuario/:id', (req, res) => {
-
-    let iD = req.params.id;
-
-    res.json({ iD });
-});
-
-app.delete('/usuario', (req, res) => {
-    res.json('delete Usuario');
-});
+    });
 
 app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
